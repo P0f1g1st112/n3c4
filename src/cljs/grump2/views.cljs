@@ -12,7 +12,7 @@
 
 (def records (r/atom []))
 (defn sender [data]
-  (POST "http://localhost:5000/create" {:body data 
+  (POST "https://arcane-meadow-67682.herokuapp.com/create" {:body data 
                                       #_{:name "Ab Bc E"
                                        :sex "F"
                                        :birth "01.02.1999"
@@ -20,7 +20,7 @@
                                        :oms (:oms)}
 
                                         :handler prn}))
-(GET "http://localhost:5000/read" {:handler 
+(GET "https://arcane-meadow-67682.herokuapp.com/read" {:handler 
                             (fn [resp] 
                               (doseq [i (s/split resp #"<br>")]
                                 (swap! records conj (edn/read-string i)))
@@ -81,11 +81,10 @@
              :on-change (fn [e]
                           (swap! to-send assoc :oms
                                  (-> e .-target .-value)))}]
-    [:br]
-    [:input {:type "submit" :value "Сохранить"
-             :on-click #(fn [e]
+    [:br][:button
+     {:on-click #(fn [e]
                           (.preventDefault e)
-                          (sender @to-send))}]
+                          (sender @to-send))} "save"]
    
     ]])
 
