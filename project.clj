@@ -9,16 +9,17 @@
                  [re-frame "1.1.1"]
                  [ring/ring-core "1.8.1"]
                  [compojure "1.6.2"]
-                 [org.immutant/immutant "2.1.10"]
+                 [ring/ring-jetty-adapter "1.8.1"]
+                 [ring/ring-devel "1.8.1"]
+                 [ring "1.8.2"]
+                 [ring-cors "0.1.13"]
                  [org.clojure/java.jdbc "0.7.11"]
                  [org.postgresql/postgresql "42.2.16.jre7"]
                  [hiccup "1.0.5"]
-                 [sqlingvo "0.9.31"]
                  [cljs-http "0.1.46"]
                  [cljs-ajax "0.8.1"]
       ]
-  :plugins [[lein-shadow "0.3.1"]     
-            [lein-shell "0.5.0"]]
+  :plugins [[lein-shadow "0.3.1"]]
   :min-lein-version "2.9.0"
   :source-paths ["src/clj" "src/cljs"]
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
@@ -27,7 +28,7 @@
     :builds {:app {:target :browser
       :output-dir "resources/public/js/compiled"
       :asset-path "/js/compiled"
-      :modules {:app {:init-fn grump2.core/init
+      :modules {:app {:init-fn united.core/init
         :preloads [devtools.preload]}}
       :devtools {:http-root "resources/public"
         :http-port 8280
@@ -75,6 +76,5 @@
 }
 
   :prep-tasks []
-  
-  :main ^:skip-aot grump2.server
+  :main ^:skip-aot united.web
   )

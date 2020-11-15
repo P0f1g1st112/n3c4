@@ -1,0 +1,123 @@
+html{
+	height: 90%;
+}
+body {
+	font-family: sans-serif;
+	font-weight: 400;
+	background: #353B50;
+	height: 100%;
+	color: white;
+}
+img {
+	display: none;
+	padding-left: 8px;
+	padding-right: 8px;
+	float: left;
+	height: 40px;
+	width: 34px;
+}      
+h1 {
+  	text-transform: uppercase;
+  	font-size: 50px;
+	font-weight: 500;
+}
+.table{
+    	overflow-y: scroll;
+    	height: 500px;
+}
+
+.table th{
+    	position: sticky;
+    	top: 0;
+}
+
+table{
+    	border-collapse: collapse;
+    	width: 99.99%;
+	text-align: center;
+	background: #5A5C68;
+}
+th {
+	font-size: 30px;
+	font-weight: 400;
+	padding:10px;
+	background: grey;
+}
+p {
+	font-size: 25px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-weight: 700;
+	color: #C8C8CC;
+}
+.opts {
+	width: 90px;
+}
+
+table tbody tr:hover {
+	background: #679AF2;
+	transition-duration: 0s;
+}
+table tbody tr:hover #counter {
+	display: none;
+}
+table tbody tr:hover img {
+	display: inline-block;
+}
+td {
+	padding: 5px;
+	border-block: 2px solid lightgrey;
+	font-size: 20px;
+}
+form {
+	align-items: center;
+	background-color: #262626;
+	bottom: 0;
+	color: #666666;
+	font-size: 5em;
+	text-transform: uppercase;
+	margin-left: 27.5%;
+	width: 45%;
+}
+input {
+	padding-block: 5px;
+	margin-block: 20px;
+	margin-left: 45px;
+	margin-right: 40px;
+	border: none;
+	border-bottom: 0.2rem solid #EA4A35;
+	background: #666666;
+	color: white;
+	font-size: 20px;
+}
+select {
+	margin-top: 5px;
+	margin-bottom: 0px;
+	padding: 5px;
+	margin-left: 35px;
+	margin-right: 5x;
+	border: none;
+	border-bottom: 0.2rem solid #EA4A35;
+	background: #666666;
+	color: white;
+	font-size: 20px;
+}
+button {
+	background: #EA4A35;
+	border: 0px;
+	margin-top: 40px;
+	margin-bottom: 0px;
+	height: 56px;
+	width: 25%;
+	text-transform: uppercase;
+	font-size: 35px;
+	color: white;
+	
+}
+#kostyl {
+	color: #262626;
+	font-size: 25px;
+}
+#deleted {
+	opacity: .1;
+	}

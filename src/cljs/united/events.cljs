@@ -1,7 +1,7 @@
-(ns grump2.events
+(ns united.events
   (:require
    [re-frame.core :as re-frame]
-   [grump2.db :as db]
+   [united.db :as db]
    ))
 
 (re-frame/reg-event-db
