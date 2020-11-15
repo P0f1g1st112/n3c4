@@ -1,10 +1,8 @@
 (ns united.views
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
    [reagent.core :as r]
    [re-frame.core :as rf]
    [cljs-http.client :as http]
-   [cljs.core.async :refer [<!]]
    [clojure.string :as s]
    [clojure.edn :as edn]
    [ajax.core :refer [GET POST]]
@@ -22,10 +20,10 @@
 
 (def records (r/atom []))
 (GET "http://localhost:5000/read" {:handler 
-                            (fn [resp] 
-                              (doseq [i (s/split resp #"<br>")]
-                                (swap! records conj (edn/read-string i)))
-                              #_(println @records)
+                            (fn [resp]
+                              (let [a (js->clj (.parse js/JSON resp) :keywordize-keys true)]
+                                (doseq [i a]
+                                   (swap! records conj i)))
                                      )})
 
 (def to-send (r/atom {:id 0

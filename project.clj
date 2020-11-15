@@ -14,6 +14,7 @@
                  [ring "1.8.2"]
                  [ring-cors "0.1.13"]
                  [org.clojure/java.jdbc "0.7.11"]
+                 [org.clojure/data.json "1.0.0"]
                  [org.postgresql/postgresql "42.2.16.jre7"]
                  [hiccup "1.0.5"]
                  [cljs-http "0.1.46"]

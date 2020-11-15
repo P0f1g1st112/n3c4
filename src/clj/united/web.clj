@@ -4,7 +4,9 @@
             [clojure.java.jdbc :as db]
             [clojure.edn :as edn]
             [clojure.string :as str]
+            [clojure.data.json :as json]
             [ring.util.request :refer [body-string]]
+            [ring.util.response :refer [response]]
             [ring.adapter.jetty :as jetty]
             [ring.middleware.cors :refer [wrap-cors]]
             ))
@@ -12,9 +14,10 @@
 (def db-adr "postgres://bnesfybfmmkphq:74d50eec43a5a79466c9ebaeb624aa1fa11a64e2d24e14d56579cc9b400f180e@ec2-54-166-107-5.compute-1.amazonaws.com:5432/d1li66jgj4vf4k")
 
 (defn records []
-        (db/query db-adr
-          ["select * from patients"])
-    )
+        (-> (db/query db-adr ["select * from patients"])
+            (json/write-str)
+            (response))
+)
 ;;middleware for ser-deser
 ;;repl-driven dev
 (defn take-rec [row]
