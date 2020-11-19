@@ -10,7 +10,7 @@
 
 (defn sender [data act]
   (case act
-  "c" (POST "http://localhost:5000/create" {:body data 
+  "c" (POST "http://localhost:5000/create" {:body data
                                             :handler prn})
   "d" (POST "http://localhost:5000/delete" {:body data
                                             :handler prn})
@@ -19,12 +19,11 @@
   ))
 
 (def records (r/atom []))
-(GET "http://localhost:5000/read" {:handler 
+(GET "http://localhost:5000/read" {:handler
                             (fn [resp]
-                              (let [a (js->clj (.parse js/JSON resp) :keywordize-keys true)]
-                                (doseq [i a]
-                                   (swap! records conj i)))
-                                     )})
+                              (doseq [i (js->clj (.parse js/JSON resp) :keywordize-keys true)]
+                                 (swap! records conj i)))
+                                     })
 
 (def to-send (r/atom {:id 0
                       :name ""
@@ -37,9 +36,9 @@
   [:div {:class "footer"}
    [:form {:style {:text-align "center"}
            :on-submit (fn [e] (.stopPropagation e))}
-    [:input {:type "text" :placeholder "Полное имя" 
+    [:input {:type "text" :placeholder "Полное имя"
              :id "name" :value (:name @to-send)
-             :on-change (fn [e] 
+             :on-change (fn [e]
                           (swap! to-send assoc :name
                                  (-> e .-target .-value))
                           (println (:name @to-send)))
@@ -62,7 +61,7 @@
              :on-change (fn [e]
                           (swap! to-send assoc :address
                                  (-> e .-target .-value)))}]
-    [:input {:type "number" :inputMode "numeric" :id "oms" 
+    [:input {:type "number" :inputMode "numeric" :id "oms"
              :placeholder "Номер полиса"
              :pattern "[0-9]{4}"
              :on-change (fn [e]
@@ -77,9 +76,14 @@
         (sender @to-send "u")
         ))} "submit"]
     [:h1 {:id "kostyl"} "kostyl"]
-   
+
     ]])
 (def counter (r/atom 0))
+
+(defn updater [k rec]
+  (set! (.. js/document (getElementById k) -value) ((keyword k) rec))
+  (swap! to-send assoc (keyword k) (.. js/document (getElementById k) -value)))
+
 (defn td-s [rec counter]
   [:tr {:id (:id rec)}
     [:td
@@ -93,21 +97,11 @@
       [:img {:src "update.png"
              :on-click (fn [e]
       (.. js/document (querySelector "#name") focus)
-      (set! (.. js/document (getElementById "name") -value) (:name rec))
-      (swap! to-send assoc :name
-        (.. js/document (getElementById "name") -value))
-      (set! (.. js/document (getElementById "sex") -value) (:sex rec))
-      (swap! to-send assoc :sex
-        (.. js/document (getElementById "sex") -value))
-      (set! (.. js/document (getElementById "birth") -value)(:birth rec))
-      (swap! to-send assoc :birth
-        (.. js/document (getElementById "birth") -value))
-      (set! (.. js/document (getElementById "address") -value)(:address rec))
-      (swap! to-send assoc :address
-        (.. js/document (getElementById "address") -value))
-      (set! (.. js/document (getElementById "oms") -value) (:oms rec))
-      (swap! to-send assoc :oms
-        (.. js/document (getElementById "oms") -value))
+                         (updater "name" rec)
+                         (updater "sex" rec)
+                         (updater "birth" rec)
+                         (updater "address" rec)
+                         (updater "oms" rec)
       (swap! to-send assoc :id (:id rec))
       (println @to-send)
       (set! (.. js/document (getElementById "create") -id) "update")
