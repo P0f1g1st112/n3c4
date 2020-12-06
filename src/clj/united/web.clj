@@ -3,7 +3,6 @@
             [compojure.route :as route]
             [clojure.java.jdbc :as db]
             [clojure.edn :as edn]
-            [clojure.string :as str]
             [clojure.data.json :as json]
             [ring.util.request :refer [body-string]]
             [ring.util.response :refer [response]]
@@ -20,42 +19,45 @@
 )
 ;;middleware for ser-deser
 ;;repl-driven dev
-(defn take-rec [row]
-  (let [rec (edn/read-string (body-string row))]
-    (db/insert! db-adr :patients {:name (:name rec)
-                                  :sex (:sex rec)
-                                  :birth (:birth rec)
-                                  :address (:address rec)
-                                  :oms (:oms rec)})
-    )
-  {:status 200
-   :body ""}
+
+
+(defn do-rec [rec]
+  (db/insert! db-adr :patients {:name (:name rec)
+                                :sex (:sex rec)
+                                :birth (:birth rec)
+                                :address (:address rec)
+                                :oms (:oms rec)})
+  (response "")
   )
 
-(defn update-rec [row]
-  (let [rec (edn/read-string (body-string row))]
-    (db/update! db-adr :patients {:name (:name rec)
-                                  :sex (:sex rec)
-                                  :birth (:birth rec)
-                                  :address (:address rec)
-                                  :oms (:oms rec)}
-                       ["id = ?" (:id rec)])
-    (println "Updated: " rec))
+(defn update-rec [rec]
+  (db/update! db-adr :patients {:name (:name rec)
+                                :sex (:sex rec)
+                                :birth (:birth rec)
+                                :address (:address rec)
+                                :oms (:oms rec)}
+                     ["id = ?" (:id rec)])
+    (response "")
   )
 
-(defn delete-rec [row]
-  (let [rec (edn/read-string (body-string row))]
-    (println "Deleted with id " (:id rec))
-    (db/delete! db-adr :patients ["id = ?" rec])
-    {:status 200
-     :body ""})
+(defn delete-rec [rec]
+  (db/delete! db-adr :patients ["id = ?" rec])
+  (response "")
   )
+
+(defn reader [row act]
+  (let [rec (edn/read-string (body-string row))]
+    (case act
+      "c" (do-rec rec)
+      "u" (update-rec rec)
+      "d" (delete-rec rec)))
+)
 
 (defroutes app
   (GET "/read" [] (records))
-  (POST "/create" req (take-rec req))
-  (POST "/update" req (update-rec req))
-  (POST "/delete" req (delete-rec req))
+  (POST "/create" req (reader req "c"))
+  (POST "/update" req (reader req "u"))
+  (POST "/delete" req (reader req "d"))
   (GET "/" []
        {:status 200
         :headers {"Content-Type" "text/plain"}
@@ -63,7 +65,7 @@
   (ANY "*" [] "<h1>404</h1>")
 )
 
-(defn cors [] (wrap-cors app :access-control-allow-origin [#"http://localhost:5000" #"http://.*" #"https://.*"]
+(defn cors [] (wrap-cors app :access-control-allow-origin [#"http://localhost:5000" #"http://.*" #"http://.*"]
                          :access-control-allow-methods [:get :put :post :delete]
                          :access-control-allow-credentials "true"))
 

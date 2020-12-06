@@ -7,6 +7,7 @@
                  [thheller/shadow-cljs "2.11.4"]
                  [reagent "0.10.0"]
                  [re-frame "1.1.1"]
+		 [day8.re-frame/http-fx "0.2.1"]
                  [ring/ring-core "1.8.1"]
                  [compojure "1.6.2"]
                  [ring/ring-jetty-adapter "1.8.1"]

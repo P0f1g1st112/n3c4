@@ -1,8 +1,20 @@
 (ns united.subs
   (:require
-   [re-frame.core :as re-frame]))
+   [re-frame.core :as rf]
+   [united.db :as db])
+)
 
-(re-frame/reg-sub
+(rf/reg-sub
  ::name
  (fn [db]
    (:name db)))
+
+(rf/reg-sub
+ ::code
+ (fn [db]
+   (:code db)))
+
+(rf/reg-sub
+ ::db-recs
+ (fn [db]
+   (:records db)))

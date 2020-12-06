@@ -2,9 +2,9 @@
   (:require
    [reagent.core :as r]
    [re-frame.core :as rf]
-   [cljs-http.client :as http]
-   [clojure.string :as s]
-   [clojure.edn :as edn]
+   [united.subs :as subs]
+   [united.events :as events]
+   [united.db :as db]
    [ajax.core :refer [GET POST]]
    ))
 
@@ -20,10 +20,9 @@
 
 (def records (r/atom []))
 (GET "http://localhost:5000/read" {:handler
-                            (fn [resp]
-                              (doseq [i (js->clj (.parse js/JSON resp) :keywordize-keys true)]
-                                 (swap! records conj i)))
-                                     })
+                                   #(doseq [i (js->clj (.parse js/JSON %) :keywordize-keys true)]
+                                      (swap! records conj i))
+                                   })
 
 (def to-send (r/atom {:id 0
                       :name ""
@@ -35,42 +34,36 @@
 (defn form []
   [:div {:class "footer"}
    [:form {:style {:text-align "center"}
-           :on-submit (fn [e] (.stopPropagation e))}
+           :on-submit #( (.stopPropagation %))}
     [:input {:type "text" :placeholder "Полное имя"
              :id "name" :value (:name @to-send)
-             :on-change (fn [e]
-                          (swap! to-send assoc :name
-                                 (-> e .-target .-value))
+             :on-change #( (swap! to-send assoc :name
+                                 (-> % .-target .-value))
                           (println (:name @to-send)))
                       }]
     [:select {:id "sex" :name "sex"
-              :on-change (fn [e]
-                           (swap! to-send assoc :sex
-                                  (-> e .-target .-value))
+              :on-change #((swap! to-send assoc :sex
+                                  (-> % .-target .-value))
                            (print (:sex @to-send)))}
      [:option {:value ""}]
      [:option {:value "M"} "М"]
      [:option {:value "F"} "Ж"]]
     [:input {:type "date" :id "birth" :placeholder "Дата рождения"
-             :on-change (fn [e]
-                          (swap! to-send assoc :birth
-                                 (-> e .-target .-value))
+             :on-change #((swap! to-send assoc :birth
+                                 (-> % .-target .-value))
                           (print (:birth @to-send)))}]
     [:br]
     [:input {:type "text" :id "address" :placeholder "Адрес"
-             :on-change (fn [e]
-                          (swap! to-send assoc :address
-                                 (-> e .-target .-value)))}]
+             :on-change #((swap! to-send assoc :address
+                                 (-> % .-target .-value)))}]
     [:input {:type "number" :inputMode "numeric" :id "oms"
              :placeholder "Номер полиса"
              :pattern "[0-9]{4}"
-             :on-change (fn [e]
-                          (swap! to-send assoc :oms
-                                 (-> e .-target .-value)))}]
+             :on-change #((swap! to-send assoc :oms
+                                 (-> % .-target .-value)))}]
     [:br][:button
       {:id "create"
-       :on-click (fn [e]
-                          #_(.preventDefault e)
+       :on-click #(#_(.preventDefault e)
       (if (.. js/document (getElementById "create"))
         (sender @to-send "c")
         (sender @to-send "u")
@@ -88,15 +81,13 @@
   [:tr {:id (:id rec)}
     [:td
       [:img {:src "delete.png"
-             :on-click (fn [e]
-                        (if (js/confirm "Удалить запись?")
+             :on-click #((if (js/confirm "Удалить запись?")
                           ((sender (:id rec) "d")
                           (set! (.. js/document (getElementById (:id rec)) -id) "deleted")
                           ))
                             )}]
       [:img {:src "update.png"
-             :on-click (fn [e]
-      (.. js/document (querySelector "#name") focus)
+             :on-click #((.. js/document (querySelector "#name") focus)
                          (updater "name" rec)
                          (updater "sex" rec)
                          (updater "birth" rec)
@@ -105,17 +96,33 @@
       (swap! to-send assoc :id (:id rec))
       (println @to-send)
       (set! (.. js/document (getElementById "create") -id) "update")
-                        )}][:p {:id "counter"} counter]]
+                         )}]
+     [:p {:id "counter"} counter]]
     [:td (:name rec)]
     [:td (:sex rec)]
     [:td (:birth rec)]
     [:td (:address rec)]
     [:td (:oms rec)]])
 
+(defn loader []
+  (set! (.. js/document (getElementById "loader") -style -display) "none")
+  (set! (.. js/document (getElementById "hidden") -id) "showed"))
+
+
 (defn main-panel []
   (do
+    #_(def _name (rf/subscribe [::subs/name]))
+    #_(def code (rf/subscribe [::subs/code]))
+    (def db-recs (rf/subscribe [::subs/db-recs]))
+    (js/setTimeout loader 3000)
     [:div
-     [:h1 {:style {:text-align "center"}} "Med dataset"]
+     [:div {:id "loader"}]
+    [:div {:id "hidden"}
+     #_[:p {:on-click #(rf/dispatch [::events/change-code])} "" @code]
+     #_[:p "" @_name]
+     [:p {:on-click #(rf/dispatch [::events/check-for-recs])}"" db-recs]
+     [:p {:on-click #(rf/dispatch [::events/initialize-db])} "clk me for re-initialize"]
+     [:h1 {:style {:text-align "center"}} "med dataset"]
       [:div {:class "table"}
        [:table
         [:thead [:tr
@@ -126,8 +133,16 @@
          [:th "Address"]
          [:th "OMS"]]]
         [:tbody
+         [:tr
+          [:td "0"]
+          [:td "a"]
+          [:td "b"]
+          [:td "c"]
+          [:td "d"]
+          [:td "e"]]
         (for [rec @records]
           [td-s rec (swap! counter inc)])
         ]]][:br]
      [form]
+     ]
      ]))
