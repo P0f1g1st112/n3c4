@@ -18,6 +18,7 @@
  (fn [db _]
    (assoc db :records @db/recs)
    (println @db/recs)
+   (println (:records db))
    (println db)))
 
 (rf/reg-event-db

@@ -18,8 +18,8 @@
                                             :handler prn})
   ))
 
-(def records (r/atom []))
-(GET "http://localhost:5000/read" {:handler
+#_(def records (r/atom []))
+#_(GET "http://localhost:5000/read" {:handler
                                    #(doseq [i (js->clj (.parse js/JSON %) :keywordize-keys true)]
                                       (swap! records conj i))
                                    })
@@ -105,6 +105,7 @@
     [:td (:oms rec)]])
 
 (defn loader []
+  (rf/dispatch [::events/initialize-db])
   (set! (.. js/document (getElementById "loader") -style -display) "none")
   (set! (.. js/document (getElementById "hidden") -id) "showed"))
 
@@ -120,27 +121,20 @@
     [:div {:id "hidden"}
      #_[:p {:on-click #(rf/dispatch [::events/change-code])} "" @code]
      #_[:p "" @_name]
-     [:p {:on-click #(rf/dispatch [::events/check-for-recs])}"" db-recs]
+     #_[:p {:on-click #(rf/dispatch [::events/check-for-recs])}(str (first @db-recs))]
      [:p {:on-click #(rf/dispatch [::events/initialize-db])} "clk me for re-initialize"]
      [:h1 {:style {:text-align "center"}} "med dataset"]
       [:div {:class "table"}
        [:table
         [:thead [:tr
          [:th {:class "opts"} ""]
-         [:th "Name"]
+         [:th "Full Name"]
          [:th "Gender"]
-         [:th "Birth date"]
+         [:th "Date of birth"]
          [:th "Address"]
          [:th "OMS"]]]
         [:tbody
-         [:tr
-          [:td "0"]
-          [:td "a"]
-          [:td "b"]
-          [:td "c"]
-          [:td "d"]
-          [:td "e"]]
-        (for [rec @records]
+        (for [rec @db-recs]
           [td-s rec (swap! counter inc)])
         ]]][:br]
      [form]
