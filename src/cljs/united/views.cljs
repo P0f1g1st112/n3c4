@@ -18,8 +18,8 @@
                                             :handler prn})
   ))
 
-#_(def records (r/atom []))
-#_(GET "http://localhost:5000/read" {:handler
+(def records (r/atom []))
+(GET "http://localhost:5000/read" {:handler
                                    #(doseq [i (js->clj (.parse js/JSON %) :keywordize-keys true)]
                                       (swap! records conj i))
                                    })
@@ -33,8 +33,7 @@
 
 (defn form []
   [:div {:class "footer"}
-   [:form {:style {:text-align "center"}
-           :on-submit #( (.stopPropagation %))}
+   [:form {:style {:text-align "center"}}
     [:input {:type "text" :placeholder "Полное имя"
              :id "name" :value (:name @to-send)
              :on-change #( (swap! to-send assoc :name
@@ -55,16 +54,18 @@
     [:br]
     [:input {:type "text" :id "address" :placeholder "Адрес"
              :on-change #((swap! to-send assoc :address
-                                 (-> % .-target .-value)))}]
+                                 (-> % .-target .-value))
+                          (print (:address @to-send)))}]
     [:input {:type "number" :inputMode "numeric" :id "oms"
              :placeholder "Номер полиса"
              :pattern "[0-9]{4}"
              :on-change #((swap! to-send assoc :oms
-                                 (-> % .-target .-value)))}]
+                                 (-> % .-target .-value))
+                          (print (:oms @to-send)))}]
     [:br][:button
       {:id "create"
-       :on-click #(#_(.preventDefault e)
-      (if (.. js/document (getElementById "create"))
+       :on-click (fn []
+                   (if (.. js/document (getElementById "create"))
         (sender @to-send "c")
         (sender @to-send "u")
         ))} "submit"]
@@ -81,10 +82,11 @@
   [:tr {:id (:id rec)}
     [:td
       [:img {:src "delete.png"
-             :on-click #((if (js/confirm "Удалить запись?")
-                          ((sender (:id rec) "d")
+             :on-click (fn []
+                         (if (js/confirm "Удалить запись?")
+                          (sender (:id rec) "d")
                           (set! (.. js/document (getElementById (:id rec)) -id) "deleted")
-                          ))
+                          )
                             )}]
       [:img {:src "update.png"
              :on-click #((.. js/document (querySelector "#name") focus)

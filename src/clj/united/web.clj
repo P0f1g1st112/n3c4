@@ -22,6 +22,7 @@
 
 
 (defn do-rec [rec]
+  (println rec)
   (db/insert! db-adr :patients {:name (:name rec)
                                 :sex (:sex rec)
                                 :birth (:birth rec)
@@ -31,6 +32,7 @@
   )
 
 (defn update-rec [rec]
+  (println rec)
   (db/update! db-adr :patients {:name (:name rec)
                                 :sex (:sex rec)
                                 :birth (:birth rec)
@@ -41,6 +43,7 @@
   )
 
 (defn delete-rec [rec]
+  (println rec)
   (db/delete! db-adr :patients ["id = ?" rec])
   (response "")
   )
